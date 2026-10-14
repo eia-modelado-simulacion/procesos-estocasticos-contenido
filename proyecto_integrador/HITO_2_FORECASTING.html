@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Proyecto integrador — Hito 2 de Forecasting</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+</head>
+<body>
+<h1 id="proyecto-integrador-hito-2-de-forecasting">Proyecto integrador — Hito 2 de Forecasting</h1>
+<h2 id="benchmarks-y-evaluación-fuera-de-muestra">Benchmarks y evaluación fuera de muestra</h2>
+<h3 id="propósito">Propósito</h3>
+<p>Establecer una estrategia de evaluación para la variable cuantitativa <span class="math inline">\(Y_t\)</span> del caso asignado y definir el benchmark que servirá como referencia para comparar modelos de forecasting más adelante.</p>
+<p>Este hito continúa la caracterización temporal realizada en el Hito 1.</p>
+<p>En esta etapa <strong>todavía no deben seleccionar un modelo final ni ajustar ETS o ARIMA</strong>.</p>
+<p>El objetivo es responder:</p>
+<blockquote>
+<p>¿Cómo evaluaremos los pronósticos y qué método simple deberá superar un modelo más complejo?</p>
+</blockquote>
+<h2 id="variables-por-caso">Variables por caso</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Caso</th>
+<th>Variable de estado</th>
+<th>Variable temporal a analizar</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>01 — Mantenimiento</td>
+<td><code>estado</code></td>
+<td><code>vibracion_rms</code></td>
+</tr>
+<tr class="even">
+<td>02 — Calidad</td>
+<td><code>estado</code></td>
+<td><code>porcentaje_no_conformes</code></td>
+</tr>
+<tr class="odd">
+<td>03 — Servicios</td>
+<td><code>estado</code></td>
+<td><code>solicitudes</code></td>
+</tr>
+<tr class="even">
+<td>04 — Plataforma</td>
+<td><code>estado</code></td>
+<td><code>usuarios_activos</code></td>
+</tr>
+</tbody>
+</table>
+<p>Todos los casos contienen 208 observaciones con frecuencia semanal.</p>
+<h2 id="actividades">Actividades</h2>
+<h3 id="definición-del-problema-de-forecasting">1. Definición del problema de forecasting</h3>
+<p>Retomen la variable <span class="math inline">\(Y_t\)</span> de su caso y definan explícitamente:</p>
+<ul>
+<li>qué se desea pronosticar;</li>
+<li>la frecuencia temporal;</li>
+<li>el horizonte de pronóstico <span class="math inline">\(h\)</span>;</li>
+<li>qué significa ese horizonte en el contexto del caso.</li>
+</ul>
+<p>El horizonte debe justificarse desde el problema de decisión.</p>
+<p>No utilicen únicamente una regla porcentual del tipo “20% de los datos para test” sin explicar su sentido temporal.</p>
+<h3 id="partición-temporal-traintest">2. Partición temporal train/test</h3>
+<p>Construyan una partición temporal que respete el orden cronológico:</p>
+<ul>
+<li><code>train</code>: observaciones disponibles antes del período de evaluación;</li>
+<li><code>test</code>: últimas observaciones reservadas para evaluar pronósticos.</li>
+</ul>
+<p>Reporten:</p>
+<ul>
+<li>número de observaciones en <code>train</code>;</li>
+<li>número de observaciones en <code>test</code>;</li>
+<li>primera y última semana de <code>train</code>;</li>
+<li>primera y última semana de <code>test</code>.</li>
+</ul>
+<p>Justifiquen por qué la partición elegida representa razonablemente un escenario real de forecasting.</p>
+<blockquote>
+<p>En series temporales no deben mezclar aleatoriamente observaciones pasadas y futuras.</p>
+</blockquote>
+<h3 id="benchmark-mean">3. Benchmark mean</h3>
+<p>Construyan el benchmark de la media.</p>
+<p>El método debe pronosticar todos los períodos futuros usando la media calculada únicamente con <code>train</code>.</p>
+<p>Reporten:</p>
+<ul>
+<li>valor medio utilizado;</li>
+<li>pronóstico para todo el horizonte;</li>
+<li>una visualización donde se comparen <code>train</code>, <code>test</code> y el pronóstico.</li>
+</ul>
+<p>Interpreten si este benchmark representa adecuadamente el nivel reciente de la serie.</p>
+<h3 id="benchmark-naive">4. Benchmark naive</h3>
+<p>Construyan el benchmark naive.</p>
+<p>El método debe utilizar la última observación disponible de <code>train</code> como pronóstico para todos los períodos futuros.</p>
+<p>Reporten:</p>
+<ul>
+<li>último valor observado en <code>train</code>;</li>
+<li>pronóstico para todo el horizonte;</li>
+<li>una visualización comparable con la del benchmark mean.</li>
+</ul>
+<p>Interpreten el resultado en lenguaje del caso.</p>
+<h3 id="benchmark-drift">5. Benchmark drift</h3>
+<p>Construyan el benchmark drift.</p>
+<p>Usen la expresión:</p>
+<p><span class="math display">\[
+\hat{y}_{T+h|T}
+=
+y_T
++
+h\left(
+\frac{y_T-y_1}{T-1}
+\right)
+\]</span></p>
+<p>Reporten:</p>
+<ul>
+<li><span class="math inline">\(y_1\)</span>;</li>
+<li><span class="math inline">\(y_T\)</span>;</li>
+<li>número de observaciones <span class="math inline">\(T\)</span>;</li>
+<li>cambio promedio por período;</li>
+<li>pronóstico para todo el horizonte.</li>
+</ul>
+<p>Expliquen qué tendencia lineal está extrapolando este benchmark.</p>
+<h3 id="seasonal-naive-solo-si-está-justificado">6. Seasonal naive — solo si está justificado</h3>
+<p>El benchmark seasonal naive es opcional.</p>
+<p>Solo debe incluirse si el análisis del Hito 1 mostró evidencia razonable de estacionalidad.</p>
+<p>Si deciden utilizarlo:</p>
+<ul>
+<li>identifiquen el período estacional;</li>
+<li>expliquen por qué ese período es razonable;</li>
+<li>construyan el pronóstico;</li>
+<li>compárenlo con los otros benchmarks.</li>
+</ul>
+<p>No deben usar seasonal naive únicamente porque la serie tenga frecuencia semanal.</p>
+<h3 id="cálculo-de-errores-fuera-de-muestra">7. Cálculo de errores fuera de muestra</h3>
+<p>Para cada benchmark calculen los errores sobre <code>test</code>:</p>
+<p><span class="math display">\[
+e_t = y_t - \hat{y}_t
+\]</span></p>
+<p>Construyan una tabla que contenga, como mínimo:</p>
+<ul>
+<li>período;</li>
+<li>valor real;</li>
+<li>pronóstico mean;</li>
+<li>pronóstico naive;</li>
+<li>pronóstico drift;</li>
+<li>errores correspondientes.</li>
+</ul>
+<p>Si utilizaron seasonal naive, inclúyanlo también.</p>
+<h3 id="métricas-de-evaluación">8. Métricas de evaluación</h3>
+<p>Calcule para cada benchmark:</p>
+<ul>
+<li>MAE;</li>
+<li>RMSE;</li>
+<li>MASE.</li>
+</ul>
+<p>Para MASE, utilicen como escala el error naive de un paso calculado exclusivamente con <code>train</code>.</p>
+<p>Presenten una tabla comparativa de resultados.</p>
+<p>La comparación debe realizarse usando exactamente el mismo conjunto <code>test</code> para todos los métodos.</p>
+<h3 id="interpretación-de-las-métricas">9. Interpretación de las métricas</h3>
+<p>Interpreten los resultados en el contexto del caso.</p>
+<p>Respondan, como mínimo:</p>
+<ul>
+<li>¿qué benchmark obtiene el menor MAE?;</li>
+<li>¿qué benchmark obtiene el menor RMSE?;</li>
+<li>¿coinciden ambos rankings?;</li>
+<li>¿qué significa el valor de MASE obtenido?;</li>
+<li>¿existen errores grandes que hagan que RMSE difiera significativamente de MAE?;</li>
+<li>¿algún benchmark parece claramente inadecuado para la estructura observada en el Hito 1?</li>
+</ul>
+<p>No se limiten a afirmar cuál número es menor.</p>
+<h3 id="selección-del-benchmark-principal">10. Selección del benchmark principal</h3>
+<p>Seleccionen un benchmark principal que servirá como referencia para las semanas siguientes.</p>
+<p>La decisión debe estar sustentada en:</p>
+<ul>
+<li>desempeño fuera de muestra;</li>
+<li>interpretación del problema;</li>
+<li>horizonte seleccionado;</li>
+<li>métricas obtenidas;</li>
+<li>estructura temporal identificada en el Hito 1.</li>
+</ul>
+<p>No es obligatorio que el benchmark principal sea naive.</p>
+<p>La selección debe responder:</p>
+<blockquote>
+<p>¿Qué método simple deberá superar un modelo más complejo para justificar su uso?</p>
+</blockquote>
+<h3 id="sensibilidad-al-horizonte">11. Sensibilidad al horizonte</h3>
+<p>Realicen una segunda evaluación con un horizonte diferente al utilizado inicialmente.</p>
+<p>No es necesario repetir todo el análisis con el mismo nivel de detalle.</p>
+<p>Comparen:</p>
+<ul>
+<li>ranking de benchmarks;</li>
+<li>MAE;</li>
+<li>RMSE;</li>
+<li>MASE.</li>
+</ul>
+<p>Expliquen si la selección del benchmark principal se mantiene o cambia.</p>
+<p>El propósito de esta sección es reconocer que el desempeño de un método puede depender del horizonte de pronóstico.</p>
+<h3 id="conclusión-diagnóstica">12. Conclusión diagnóstica</h3>
+<p>En máximo <strong>250 palabras</strong>, integren los resultados y respondan:</p>
+<blockquote>
+<p>¿Qué tan difícil parece pronosticar esta serie y qué benchmark debe utilizarse como línea base para evaluar los modelos de las próximas semanas?</p>
+</blockquote>
+<p>La conclusión debe mencionar, cuando corresponda:</p>
+<ul>
+<li>horizonte de pronóstico;</li>
+<li>partición train/test;</li>
+<li>benchmark con mejor desempeño;</li>
+<li>comportamiento de MAE, RMSE y MASE;</li>
+<li>sensibilidad al horizonte;</li>
+<li>relación con la estructura identificada en el Hito 1.</li>
+</ul>
+<p>En este hito <strong>no deben seleccionar todavía ETS, ARIMA ni ningún modelo final</strong>.</p>
+<h2 id="entregable">Entregable</h2>
+<p>Entreguen un notebook ejecutable de principio a fin que contenga:</p>
+<ul>
+<li>código reproducible;</li>
+<li>partición temporal claramente identificada;</li>
+<li>pronósticos de los benchmarks;</li>
+<li>gráficos con título, ejes y unidades;</li>
+<li>tabla de errores;</li>
+<li>tabla comparativa de métricas;</li>
+<li>interpretaciones en lenguaje del caso;</li>
+<li>selección justificada del benchmark principal;</li>
+<li>análisis de sensibilidad al horizonte;</li>
+<li>conclusión diagnóstica final.</li>
+</ul>
+<p>El notebook debe poder ejecutarse mediante <strong>Run All</strong> sin errores.</p>
+<h2 id="criterio-central-de-evaluación">Criterio central de evaluación</h2>
+<p>La evaluación se centrará en la capacidad de <strong>diseñar una comparación justa de forecasting e interpretar el desempeño fuera de muestra</strong>.</p>
+<p>No es suficiente calcular métricas. Deben justificar:</p>
+<ul>
+<li>cómo se definió el horizonte;</li>
+<li>por qué la partición temporal es adecuada;</li>
+<li>qué benchmark constituye la línea base;</li>
+<li>y qué significan los resultados para la decisión de modelado posterior.</li>
+</ul>
+</body>
+</html>
