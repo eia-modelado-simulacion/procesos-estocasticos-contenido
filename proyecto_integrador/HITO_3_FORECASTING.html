@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Proyecto integrador — Hito 3 de Forecasting</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" type="text/javascript"></script>
+</head>
+<body>
+<h1 id="proyecto-integrador-hito-3-de-forecasting">Proyecto integrador — Hito 3 de Forecasting</h1>
+<h2 id="suavizamiento-exponencial-y-comparación-con-el-benchmark">Suavizamiento exponencial y comparación con el benchmark</h2>
+<h3 id="propósito">Propósito</h3>
+<p>Seleccionar, ajustar, evaluar e interpretar modelos de suavizamiento exponencial para la variable cuantitativa <span class="math inline">\(Y_t\)</span>, distinguiendo nivel, tendencia y error. Este hito conecta la estructura del Hito 1 con la evaluación del Hito 2.</p>
+<blockquote>
+<p>¿El uso de suavizamiento exponencial aporta una mejora real frente al benchmark simple seleccionado en el Hito 2?</p>
+</blockquote>
+<p>La comparación es provisional: todavía no se selecciona el modelo final definitivo del proyecto.</p>
+<h2 id="variables-por-caso">Variables por caso</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Caso</th>
+<th>Variable de estado <span class="math inline">\(X_t\)</span></th>
+<th>Variable temporal <span class="math inline">\(Y_t\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>01 — Mantenimiento</td>
+<td><code>estado</code></td>
+<td><code>vibracion_rms</code></td>
+</tr>
+<tr class="even">
+<td>02 — Calidad</td>
+<td><code>estado</code></td>
+<td><code>porcentaje_no_conformes</code></td>
+</tr>
+<tr class="odd">
+<td>03 — Servicios</td>
+<td><code>estado</code></td>
+<td><code>solicitudes</code></td>
+</tr>
+<tr class="even">
+<td>04 — Plataforma</td>
+<td><code>estado</code></td>
+<td><code>usuarios_activos</code></td>
+</tr>
+</tbody>
+</table>
+<p>Todos los casos contienen 208 observaciones semanales. Se pronostica <span class="math inline">\(Y_t\)</span>; <span class="math inline">\(X_t\)</span> conserva su interpretación como estado del sistema, sin convertirse automáticamente en predictor.</p>
+<h2 id="actividades">Actividades</h2>
+<h3 id="recuperación-del-diagnóstico-y-del-benchmark">1. Recuperación del diagnóstico y del benchmark</h3>
+<ul>
+<li>Resuman la estructura identificada en Hito 1: nivel, posible tendencia, variabilidad y dependencia de corto plazo.</li>
+<li>Recuperen el benchmark principal seleccionado en Hito 2 y su justificación; puede ser mean, naive, drift u otro benchmark previamente justificado.</li>
+<li>Indiquen qué tendría que mejorar un modelo más flexible para justificar su uso.</li>
+</ul>
+<p>Contrasten la estructura identificada en el Hito 1 con los resultados de los modelos de suavizamiento. No impongan tendencia ni estacionalidad si sus datos no proporcionan evidencia para ello.</p>
+<h3 id="evaluación-temporal-comparable">2. Evaluación temporal comparable</h3>
+<p>Mantengan el horizonte, corte temporal y test principal del Hito 2. Reporten número de observaciones, primera y última semana de cada partición y sentido operativo del horizonte. No mezclen pasado y futuro aleatoriamente.</p>
+<p>Si es indispensable corregir una decisión previa, justifíquenlo y recalculen también el benchmark con el nuevo corte: no comparen métricas de tests diferentes. Ajusten parámetros y seleccionen estructura únicamente con train. Los valores de test se utilizan para evaluación, no para optimizar alpha, phi ni la configuración de AutoETS.</p>
+<h3 id="ses-nivel-que-se-actualiza">3. SES: nivel que se actualiza</h3>
+<p>Ajusten SES con inicialización y alpha estimados exclusivamente con train. Reporten <span class="math inline">\(\alpha\)</span> y el nivel final <span class="math inline">\(\ell_T\)</span> e interpreten:</p>
+<p><span class="math display">\[
+\ell_t=\alpha y_t+(1-\alpha)\ell_{t-1}
+\]</span></p>
+<p>Expliquen qué implica el alpha obtenido en términos de memoria y reacción. Distingan el nivel actualizado de una predicción previa a observar el dato. Construyan el pronóstico para todo test y expliquen por qué es horizontal.</p>
+<h3 id="holt-nivel-y-tendencia">4. Holt: nivel y tendencia</h3>
+<p>Ajusten Holt con train. Reporten e interpreten nivel final <span class="math inline">\(\ell_T\)</span> y tendencia final <span class="math inline">\(b_T\)</span>, en unidades de su variable y unidades por semana, respectivamente.</p>
+<p><span class="math display">\[
+\hat{y}_{T+k|T}=\ell_T+k b_T,\qquad k=1,\ldots,h
+\]</span></p>
+<p>Construyan gráficos de las componentes de nivel y tendencia, como en F02_03, y expliquen si la tendencia local resulta consistente con Hito 1. Produzcan pronósticos sobre el mismo test.</p>
+<h3 id="tendencia-amortiguada">5. Tendencia amortiguada</h3>
+<p>Ajusten al menos una variante de Holt con tendencia amortiguada. Reporten <span class="math inline">\(\phi\)</span>, interpreten cómo reduce la contribución futura de tendencia y comparen su trayectoria con Holt no amortiguado.</p>
+<p><span class="math display">\[
+\hat{y}_{T+k|T}=\ell_T+(\phi+\phi^2+\cdots+\phi^k)b_T
+\]</span></p>
+<p>Justifiquen si amortiguar tiene sentido operativo. No es obligatorio que esta variante gane.</p>
+<h3 id="autoets-e-interpretación-de-la-estructura">6. AutoETS e interpretación de la estructura</h3>
+<p>Usen AutoETS sin estacionalidad: <code>season_length=1, model="ZZN"</code>, como en el notebook formativo. Esto restringe la búsqueda de componentes, no cambia la frecuencia semanal de los datos.</p>
+<p>Reporten el modelo seleccionado mediante <code>auto.model_["method"]</code> y su AICc. Decodifiquen <strong>ETS(Error, Trend, Seasonal)</strong>:</p>
+<ul>
+<li>error aditivo o multiplicativo y su interpretación en relación con la variabilidad;</li>
+<li>presencia o ausencia de tendencia y, si corresponde, amortiguación;</li>
+<li>ausencia de componente estacional.</li>
+</ul>
+<p>AICc selecciona entre candidatos admisibles dentro de train; no garantiza el menor error fuera de muestra. Si hay ceros o valores negativos, no fuercen error multiplicativo. Interpreten la estructura elegida en el contexto del caso, sin aceptar el resultado automáticamente.</p>
+<p>Produzcan el forecast sobre el mismo test. No se requieren derivaciones completas de las ecuaciones de espacio de estados.</p>
+<h3 id="comparación-fuera-de-muestra">7. Comparación fuera de muestra</h3>
+<p>Construyan una tabla por período con valor real, pronóstico y error <span class="math inline">\(e_t=y_t-\hat{y}_t\)</span> para benchmark principal, SES, Holt, Holt amortiguado y AutoETS. Incluyan un gráfico comparable de train reciente, test y pronósticos, con títulos, ejes y unidades.</p>
+<p>Calculen para todos:</p>
+<p><span class="math display">\[
+MAE=\frac{1}{h}\sum_{t=T+1}^{T+h}|e_t|,\qquad
+RMSE=\sqrt{\frac{1}{h}\sum_{t=T+1}^{T+h}e_t^2}
+\]</span></p>
+<p><span class="math display">\[
+MASE=\frac{MAE}{\frac{1}{T-1}\sum_{t=2}^{T}|y_t-y_{t-1}|}
+\]</span></p>
+<p>La escala MASE es la naive de un paso calculada solo con train, igual que en Hito 2. Si es prácticamente cero, reporten MASE como no definido y expliquen la limitación.</p>
+<p>Presenten una tabla única. MAE y RMSE tienen las unidades de <span class="math inline">\(Y_t\)</span>; RMSE penaliza más errores grandes. MASE es adimensional: un valor menor que 1 mejora la escala naive de un paso en train, pero <strong>no demuestra por sí solo superar al benchmark principal sobre test</strong>. Para eso comparen directamente sus filas.</p>
+<p>Identifiquen el mejor suavizamiento según MAE y revisen si el ranking por RMSE coincide. Cuantifiquen la reducción relativa de MAE frente al benchmark si su MAE no es cero; en caso contrario comparen diferencias absolutas. Discutan si la mejora es relevante para la decisión del caso, sin inventar un umbral universal.</p>
+<h3 id="residuos-y-dependencia-pendiente">8. Residuos y dependencia pendiente</h3>
+<p>Analicen residuos de un paso en train de AutoETS y del suavizamiento con menor MAE si es otro modelo. Para SES/Holt usen observado menos <code>fittedvalues</code>; para AutoETS, observado menos <code>predict_in_sample()["fitted"]</code>, en unidades originales.</p>
+<p>Para cada modelo diagnosticado:</p>
+<ul>
+<li>construyan el gráfico temporal de residuos;</li>
+<li>reporten e interpreten su media respecto a la escala de la variable;</li>
+<li>construyan ACF sin lag cero, con un máximo de rezagos razonable y justificado;</li>
+<li>indiquen si hay rachas, cambios de variabilidad o autocorrelaciones sistemáticas;</li>
+<li>determinen si queda dependencia temporal lineal sin explicar, conectando con lag plots y ACF del Hito 1.</li>
+</ul>
+<p>Distingan residuos de un paso en train de errores a varios pasos sobre test. Media próxima a cero no implica independencia. Un pico aislado puede ocurrir por azar; las bandas de ACF son aproximadas. Tampoco una ACF sin patrones garantiza buen pronóstico.</p>
+<h3 id="juicio-sobre-el-valor-de-la-complejidad">9. Juicio sobre el valor de la complejidad</h3>
+<p>Integren desempeño fuera de muestra, estructura de la serie, componentes estimadas y residuos. Justifiquen si el suavizamiento aporta valor frente a la referencia del Hito 2. Conservar el benchmark si no se mejora es una conclusión válida.</p>
+<p>Un único corte no demuestra superioridad general. No reemplacen repetidamente el test para obtener una victoria. Pueden recuperar la sensibilidad al horizonte del Hito 2 como análisis adicional, siempre recalculando todos los modelos y el benchmark para cada corte.</p>
+<h3 id="conclusión-diagnóstica">10. Conclusión diagnóstica</h3>
+<p>En máximo <strong>300 palabras</strong>, respondan:</p>
+<ol type="1">
+<li>¿Qué modelo de suavizamiento funcionó mejor?</li>
+<li>¿Superó al benchmark? Sustenten con las tres métricas y el horizonte.</li>
+<li>¿Qué estructura temporal parece haber capturado?</li>
+<li>¿Qué estructura parece quedar en los residuos?</li>
+<li>¿Qué implicación tienen estos resultados para la siguiente etapa de modelado?</li>
+</ol>
+<p>Conecten explícitamente con Hito 1 y preparen preguntas para estacionariedad, diferenciación y modelos ARIMA de Semana 4. En este hito <strong>no ajusten ARIMA</strong>, no seleccionen el modelo final definitivo y no realicen derivaciones completas de espacio de estados.</p>
+<p>Holt-Winters se menciona como extensión estacional: <strong>no es requisito ni debe utilizarse automáticamente por tratarse de datos semanales</strong>.</p>
+<h2 id="entregable">Entregable</h2>
+<p>Entreguen un notebook ejecutable de principio a fin mediante <strong>Run All</strong>, con:</p>
+<ul>
+<li>código reproducible y rutas relativas, sin depender de una carpeta personal;</li>
+<li>benchmark del Hito 2 y evaluación temporal claramente identificados;</li>
+<li>ajustes SES, Holt, tendencia amortiguada y AutoETS;</li>
+<li>interpretación de alpha, nivel, tendencia, phi y estructura ETS;</li>
+<li>pronósticos, tabla de errores y comparación MAE/RMSE/MASE;</li>
+<li>gráficos con títulos, ejes y unidades;</li>
+<li>diagnóstico de residuos y relación con Hito 1;</li>
+<li>conclusión final de máximo 300 palabras.</li>
+</ul>
+<h2 id="criterio-central-de-evaluación">Criterio central de evaluación</h2>
+<p>La evaluación se centra en determinar si la complejidad adicional <strong>aporta valor frente a una referencia simple bajo una comparación justa</strong>. No basta ejecutar AutoETS ni señalar el número más bajo: deben explicar la estructura capturada, la dependencia pendiente y las implicaciones para el sistema.</p>
+</body>
+</html>
